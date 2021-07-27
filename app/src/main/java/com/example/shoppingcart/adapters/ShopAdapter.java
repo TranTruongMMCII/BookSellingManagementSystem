@@ -3,6 +3,7 @@ package com.example.shoppingcart.adapters;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -51,15 +53,21 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.MyViewHolder> 
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Glide.with(context)
                 .load(products.get(position).getImageUrl())
-                .placeholder(R.drawable.sanpham1)
+                .placeholder(R.drawable.outline_autorenew_black_24dp)
                 .into(holder.imgProduct);
         holder.txtName.setText(products.get(position).getName());
         holder.txtPrice.setText(String.valueOf(products.get(position).getPrice()));
         holder.txtAvailibility.setText(checkProductBeingOutOfStock(products.get(position).getQuantity()));
-        holder.btnAddToCart.setEnabled(products.get(position).getQuantity() != 0);
+        if (products.get(position).getQuantity() == 0){
+            holder.btnAddToCart.setEnabled(false);
+            holder.txtAvailibility.setTextColor(Color.RED);
+        }
+
 
         holder.btnAddToCart.setOnClickListener(view -> {
-            ShopActivity.productID.add(products.get(position).getId());
+            Constants.productID.add(products.get(position).getId());
+            System.out.println(Constants.productID.size());
+            Toast.makeText(context, "Thêm vào giỏ hàng thành công.", Toast.LENGTH_LONG).show();
         });
 
         holder.itemView.setOnClickListener(view -> {

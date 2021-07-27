@@ -3,8 +3,8 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string-array name="spinnerThanhToan">
-        <item>Thanh toán tiền mặt khi nhận hàng</item>
-        <item>Thanh toán qua thẻ ngân hàng</item>
-        <item>Thanh toán qua Momo</item>
+        <item>Tiền mặt khi nhận hàng</item>
+        <item>Thẻ ngân hàng</item>
+        <item>Ví điện tử Momo</item>
     </string-array>
 </resources>

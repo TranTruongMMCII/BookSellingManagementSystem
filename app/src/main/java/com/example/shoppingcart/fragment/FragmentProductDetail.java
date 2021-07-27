@@ -1,6 +1,7 @@
 package com.example.shoppingcart.fragment;
 
 import android.app.Dialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -10,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -55,7 +57,9 @@ public class FragmentProductDetail extends DialogFragment implements View.OnClic
         btnExit.setOnClickListener(view -> dismiss());
 
         btnAddToCart.setOnClickListener(view -> {
-            ShopActivity.productID.add(id);
+            Constants.productID.add(id);
+            System.out.println(Constants.productID.size());
+            Toast.makeText(getActivity(), "Thêm vào giỏ hàng thành công.", Toast.LENGTH_LONG).show();
         });
 
         return view;
@@ -71,22 +75,21 @@ public class FragmentProductDetail extends DialogFragment implements View.OnClic
         txtContent.setText(bundle.getString("content"));
         Glide.with(getActivity())
                 .load(bundle.getString("url"))
-                .placeholder(R.drawable.sanpham1)
+                .placeholder(R.drawable.outline_autorenew_black_24dp)
                 .into(imgProduct);
 
         if (bundle.getBoolean("out-of-stock")){
+            txtAvailability.setTextColor(Color.RED);
             btnAddToCart.setEnabled(false);
         }
 
         txtContent.setOnTouchListener((view, motionEvent) -> {
-
             view.getParent().requestDisallowInterceptTouchEvent(true);
             switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
                 case MotionEvent.ACTION_UP:
                     view.getParent().requestDisallowInterceptTouchEvent(false);
                     break;
             }
-
             return false;
         });
         txtContent.setKeyListener(null);

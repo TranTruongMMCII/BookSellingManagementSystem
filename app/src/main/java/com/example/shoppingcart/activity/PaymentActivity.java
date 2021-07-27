@@ -1,11 +1,9 @@
 package com.example.shoppingcart.activity;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -20,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
 import com.example.shoppingcart.AppDatabase;
-import com.example.shoppingcart.AppExecutors;
 import com.example.shoppingcart.Constants;
 import com.example.shoppingcart.R;
 import com.example.shoppingcart.adapters.PaymentAdapter;
@@ -34,15 +31,15 @@ import java.util.Date;
 import java.util.List;
 
 public class PaymentActivity extends AppCompatActivity {
-    EditText txtNguoiNhan;
+    EditText txtNguoiNhan, txtDiaChi;
     TextView txtNgayDat, txtTongTien, txtKhuyenMai, txtTongTienPhaiThanhToan;
     Spinner spinnerThanhToan;
     RecyclerView paymentRecyclerview;
     Button btnThanhToan, btnBack;
     AppDatabase appDatabase;
     PaymentAdapter paymentAdapter;
-    List<Integer> productID = ViewCartActivity.productID;
-    List<Integer> quantities = ViewCartActivity.quantities;
+    List<Integer> productID = Constants.productID;
+    List<Integer> quantities = Constants.quantities;
     float sum = 0;
 
     @Override
@@ -51,6 +48,7 @@ public class PaymentActivity extends AppCompatActivity {
         setContentView(R.layout.activity_payment);
 
         txtNguoiNhan = findViewById(R.id.txtNguoiNhan);
+        txtDiaChi = findViewById(R.id.txtDiachi);
         txtNgayDat = findViewById(R.id.txtNgayDat);
         txtTongTien = findViewById(R.id.txtTongTien);
         txtKhuyenMai = findViewById(R.id.txtKhuyenMai);
@@ -89,44 +87,45 @@ public class PaymentActivity extends AppCompatActivity {
         btnBack.setOnClickListener(view -> startActivity(new Intent(PaymentActivity.this, ViewCartActivity.class)));
 
         btnThanhToan.setOnClickListener(view -> {
-            if (validateInput()){
-                AppExecutors.getInstance().getDiskIO().execute(() -> {
-                    Order order = new Order(Constants.USERNAME, txtNgayDat.getText().toString(), Float.parseFloat(txtTongTienPhaiThanhToan.getText().toString()));
-                    appDatabase.orderDAO().insert(order);
-                    int id = appDatabase.orderDAO().getLastOrder();
-                    for(int i = 0; i < productID.size(); ++i){
-                        OrderDetail orderDetail = new OrderDetail(id, productID.get(i), quantities.get(i));
-                        appDatabase.orderDetailDAO().insert(orderDetail);
-                        Product product = appDatabase.productDAO().getProductByID(productID.get(i));
-                        product.setQuantity(product.getQuantity() - quantities.get(i));
-                        appDatabase.productDAO().update(product);
-                    }
-                });
-
-                String str = "Thông tin thanh toán:\n" +
-                        "Người nhận: " + txtNguoiNhan.getText().toString() +"\n" +
-                        "Ngày đặt: " + txtNgayDat.getText().toString() + "\n" +
-                        "Số tiền: " + txtTongTienPhaiThanhToan.getText().toString() + "\n" +
-                        "Hình thức thanh toán: " + spinnerThanhToan.getSelectedItem().toString() + "\n";
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(PaymentActivity.this);
-                builder.setTitle("Thanh toán");
-                builder.setMessage(str);
-                builder.setCancelable(false);
-                builder.setPositiveButton("Xem lịch sử", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        startActivity(new Intent(PaymentActivity.this, ViewHistoryActivity.class));
-                    }
-                });
-                builder.setNegativeButton("Tiếp tục mua hàng", (dialogInterface, i) -> {
-                    ShopActivity.productID = new ArrayList<>();
-                    startActivity(new Intent(PaymentActivity.this, ShopActivity.class));
-                });
-                AlertDialog alert = builder.create();
-                alert.show();
-            }
+            btnThanhToanClick();
         });
+    }
+
+    private void btnThanhToanClick() {
+        if (validateInput()){
+            Order order = new Order(Constants.USERNAME, txtNgayDat.getText().toString(), Float.parseFloat(txtTongTienPhaiThanhToan.getText().toString()));
+            appDatabase.orderDAO().insert(order);
+            int id = appDatabase.orderDAO().getLastOrder();
+            for(int i = 0; i < productID.size(); ++i){
+                OrderDetail orderDetail = new OrderDetail(id, productID.get(i), quantities.get(i));
+                appDatabase.orderDetailDAO().insert(orderDetail);
+                Product product = appDatabase.productDAO().getProductByID(productID.get(i));
+                product.setQuantity(product.getQuantity() - quantities.get(i));
+                appDatabase.productDAO().update(product);
+            }
+
+            String str = "Thông tin thanh toán:\n" +
+                    "Người nhận: " + txtNguoiNhan.getText().toString() +"\n" +
+                    "Ngày đặt: " + txtNgayDat.getText().toString() + "\n" +
+                    "Số tiền: " + txtTongTienPhaiThanhToan.getText().toString() + "\n" +
+                    "Hình thức thanh toán: " + spinnerThanhToan.getSelectedItem().toString() + "\n" +
+                    "Địa chỉ: " + txtDiaChi.getText().toString() + "\n";
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(PaymentActivity.this);
+            builder.setTitle("Thanh toán thành công");
+            builder.setMessage(str);
+            builder.setCancelable(false);
+            builder.setPositiveButton("Xem lịch sử", (dialogInterface, i) -> startActivity(new Intent(PaymentActivity.this, ViewHistoryActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)));
+            builder.setNegativeButton("Tiếp tục mua hàng", (dialogInterface, i) -> {
+                Constants.productID = new ArrayList<>();
+                startActivity(new Intent(PaymentActivity.this, ShopActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            });
+            AlertDialog alert = builder.create();
+            alert.show();
+            Constants.productID.clear();
+            Constants.quantities.clear();
+            Constants.productID.clear();
+        }
     }
 
     @Override
@@ -138,12 +137,10 @@ public class PaymentActivity extends AppCompatActivity {
     private void retrieveTasks() {
         List<Product> products = new ArrayList<>();
         appDatabase = Room.databaseBuilder(PaymentActivity.this, AppDatabase.class, "app-database").allowMainThreadQueries().build();
-        AppExecutors.getInstance().getDiskIO().execute(() -> {
-            for (int i = 0; i < productID.size(); ++i){
-                Product product = appDatabase.productDAO().getProductByID(productID.get(i));
-                products.add(product);
-            }
-        });
+        for (int i = 0; i < productID.size(); ++i){
+            Product product = appDatabase.productDAO().getProductByID(productID.get(i));
+            products.add(product);
+        }
         paymentAdapter.setTasks(products);
     }
 
@@ -152,7 +149,10 @@ public class PaymentActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Tên người nhận không được để trống.", Toast.LENGTH_LONG).show();
             return false;
         }
-
+        if (TextUtils.isEmpty(txtDiaChi.getText())){
+            Toast.makeText(getApplicationContext(), "Địa chỉ nhận không được để trống.", Toast.LENGTH_LONG).show();
+            return false;
+        }
         return true;
     }
 }

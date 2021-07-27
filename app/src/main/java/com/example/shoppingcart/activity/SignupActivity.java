@@ -16,7 +16,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
 import com.example.shoppingcart.AppDatabase;
-import com.example.shoppingcart.AppExecutors;
 import com.example.shoppingcart.Constants;
 import com.example.shoppingcart.R;
 import com.example.shoppingcart.models.User;
@@ -46,6 +45,9 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         this.btnSignup.setOnClickListener(this::onClick);
         this.imgView.setOnClickListener(this::onClick);
         this.imgView2.setOnClickListener(this::onClick);
+
+        txtPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        txtPasswordAgain.setTransformationMethod(PasswordTransformationMethod.getInstance());
     }
 
     @Override
@@ -90,18 +92,16 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 
     private void signUp() {
         if (validateInput()){
-            AppExecutors.getInstance().getDiskIO().execute(() -> {
-                User user = appDatabase.userDAO().getUserByUsername(txtUsername.getText().toString());
-                if (user != null){
-                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Tài khoản đã tồn tại!", Toast.LENGTH_LONG).show());
-                }
-                else{
-                    user = new User(txtUsername.getText().toString(), txtPassword.getText().toString());
-                    appDatabase.userDAO().insert(user);
-                    Constants.USERNAME = txtUsername.getText().toString();
-                    startActivity(new Intent(SignupActivity.this, ShopActivity.class));
-                }
-            });
+            User user = appDatabase.userDAO().getUserByUsername(txtUsername.getText().toString());
+            if (user != null){
+                runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Tài khoản đã tồn tại!", Toast.LENGTH_LONG).show());
+            }
+            else{
+                user = new User(txtUsername.getText().toString(), txtPassword.getText().toString());
+                appDatabase.userDAO().insert(user);
+                Constants.USERNAME = txtUsername.getText().toString();
+                startActivity(new Intent(SignupActivity.this, ShopActivity.class));
+            }
         }
     }
 
