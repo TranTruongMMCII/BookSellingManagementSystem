@@ -99,8 +99,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
             else{
                 user = new User(txtUsername.getText().toString(), txtPassword.getText().toString());
                 appDatabase.userDAO().insert(user);
-                Constants.USERNAME = txtUsername.getText().toString();
-                startActivity(new Intent(SignupActivity.this, ShopActivity.class));
+                startActivity(new Intent(SignupActivity.this, LoginActivity.class));
             }
         }
     }
