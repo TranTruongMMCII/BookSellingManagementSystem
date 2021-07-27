@@ -65,8 +65,7 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.MyViewHolder> 
 
 
         holder.btnAddToCart.setOnClickListener(view -> {
-            Constants.productID.add(products.get(position).getId());
-            System.out.println(Constants.productID.size());
+            Constants.incrementValue(Constants.ORDER, products.get(position).getId());
             Toast.makeText(context, "Thêm vào giỏ hàng thành công.", Toast.LENGTH_LONG).show();
         });
 

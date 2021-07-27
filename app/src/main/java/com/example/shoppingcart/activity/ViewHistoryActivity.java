@@ -41,9 +41,7 @@ public class ViewHistoryActivity extends AppCompatActivity {
         recyclerView.setAdapter(viewHistoryAdapter);
 
         btn.setOnClickListener(view -> {
-            Constants.productID.clear();
-            Constants.productID.clear();
-            Constants.quantities.clear();
+            Constants.ORDER.clear();
             startActivity(new Intent(ViewHistoryActivity.this, LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
         });
 

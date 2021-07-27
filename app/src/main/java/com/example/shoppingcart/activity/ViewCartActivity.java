@@ -56,15 +56,11 @@ public class ViewCartActivity extends AppCompatActivity {
     }
 
     private void retrieveTasks() {
-        Set<Integer> set = new LinkedHashSet<>();
-        set.addAll(Constants.productID);
-        Constants.productID.clear();
-        Constants.productID.addAll(set);
+        Set<Integer> productID = Constants.ORDER.keySet();
         List<Product> products = new ArrayList<>();
         AppDatabase appDatabase = Room.databaseBuilder(ViewCartActivity.this, AppDatabase.class, "app-database").allowMainThreadQueries().build();
-        for (int i:Constants.productID){
+        for (int i:productID){
             products.add(appDatabase.productDAO().getProductByID(i));
-            Constants.quantities.add(1);
         }
         cartAdapter.setTasks(products);
     }

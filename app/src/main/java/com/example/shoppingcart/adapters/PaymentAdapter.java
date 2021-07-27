@@ -20,11 +20,7 @@ import java.util.List;
 
 public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.MyViewHolder> {
     private Context context;
-    private List<Integer> productIDs = Constants.productID;
-    private List<Integer> quantities = Constants.quantities;
     private List<Product> products  = new ArrayList<>();
-    private AppDatabase appDatabase;
-    float sum = 0;
 
     public PaymentAdapter(Context context) {
         this.context = context;
@@ -42,18 +38,14 @@ public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.MyViewHo
     public void onBindViewHolder(@NonNull PaymentAdapter.MyViewHolder holder, int position) {
             holder.txtName.setText(products.get(position).getName());
             holder.txtPrice.setText(String.valueOf(products.get(position).getPrice()));
-            holder.txtQuantities.setText(String.valueOf(quantities.get(position)));
+            holder.txtQuantities.setText(String.valueOf(Constants.ORDER.get(products.get(position).getId())));
             holder.txtTotal.setText(String.valueOf(
                     Integer.parseInt(holder.txtQuantities.getText().toString()) * products.get(position).getPrice()));
     }
 
     @Override
     public int getItemCount() {
-        return productIDs.size();
-    }
-
-    public float getSum(){
-        return sum;
+        return products.size();
     }
 
     public void setTasks(List<Product> tasks){

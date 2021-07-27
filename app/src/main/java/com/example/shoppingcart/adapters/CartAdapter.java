@@ -25,7 +25,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyViewHolder> 
     private Context context;
     private List<Integer> productIDs = new ArrayList<>();
     private List<Product> products = new ArrayList<>();
-    private AppDatabase appDatabase;
 
     public CartAdapter(Context context) {
         this.context = context;
@@ -48,9 +47,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.MyViewHolder> 
                     .into(holder.imgProduct);
             holder.txtName.setText(products.get(position).getName());
             holder.numberPicker.setMaxValue(products.get(position).getQuantity());
-            holder.numberPicker.setValue(1);
-
-            holder.numberPicker.setOnValueChangedListener((numberPicker, i, i1) -> Constants.quantities.set(position, i1));
+            holder.numberPicker.setValue(
+                    Constants.ORDER.get(products.get(position).getId()) > holder.numberPicker.getMaxValue() ?
+                            holder.numberPicker.getMaxValue() : Constants.ORDER.get(products.get(position).getId()));
+            Constants.ORDER.put(products.get(position).getId(), holder.numberPicker.getValue());
+            holder.numberPicker.setOnValueChangedListener((numberPicker, i, i1) -> Constants.ORDER.put(products.get(position).getId(), i1));
         }
         catch (Exception e){
 

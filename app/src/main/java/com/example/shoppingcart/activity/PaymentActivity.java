@@ -29,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 public class PaymentActivity extends AppCompatActivity {
     EditText txtNguoiNhan, txtDiaChi;
@@ -38,8 +39,8 @@ public class PaymentActivity extends AppCompatActivity {
     Button btnThanhToan, btnBack;
     AppDatabase appDatabase;
     PaymentAdapter paymentAdapter;
-    List<Integer> productID = Constants.productID;
-    List<Integer> quantities = Constants.quantities;
+    List<Integer> productID = new ArrayList<>(Constants.ORDER.keySet());
+    List<Integer> quantities = new ArrayList<>(Constants.ORDER.values());
     float sum = 0;
 
     @Override
@@ -58,6 +59,16 @@ public class PaymentActivity extends AppCompatActivity {
         btnThanhToan = findViewById(R.id.btnThanhToan);
         btnBack = findViewById(R.id.btnBack);
 
+        retrievesTask();
+
+        btnBack.setOnClickListener(view -> startActivity(new Intent(PaymentActivity.this, ViewCartActivity.class)));
+
+        btnThanhToan.setOnClickListener(view -> {
+            btnThanhToanClick();
+        });
+    }
+
+    private void retrievesTask() {
         txtNguoiNhan.setText(Constants.USERNAME);
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         Date date = new Date();
@@ -83,12 +94,6 @@ public class PaymentActivity extends AppCompatActivity {
             txtKhuyenMai.setText(String.valueOf(0));
         }
         txtTongTienPhaiThanhToan.setText(String.valueOf(sum - Float.parseFloat(txtKhuyenMai.getText().toString())));
-
-        btnBack.setOnClickListener(view -> startActivity(new Intent(PaymentActivity.this, ViewCartActivity.class)));
-
-        btnThanhToan.setOnClickListener(view -> {
-            btnThanhToanClick();
-        });
     }
 
     private void btnThanhToanClick() {
@@ -117,14 +122,12 @@ public class PaymentActivity extends AppCompatActivity {
             builder.setCancelable(false);
             builder.setPositiveButton("Xem lịch sử", (dialogInterface, i) -> startActivity(new Intent(PaymentActivity.this, ViewHistoryActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)));
             builder.setNegativeButton("Tiếp tục mua hàng", (dialogInterface, i) -> {
-                Constants.productID = new ArrayList<>();
+                Constants.ORDER.clear();
                 startActivity(new Intent(PaymentActivity.this, ShopActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
             });
             AlertDialog alert = builder.create();
             alert.show();
-            Constants.productID.clear();
-            Constants.quantities.clear();
-            Constants.productID.clear();
+            Constants.ORDER.clear();
         }
     }
 
@@ -139,7 +142,9 @@ public class PaymentActivity extends AppCompatActivity {
         appDatabase = Room.databaseBuilder(PaymentActivity.this, AppDatabase.class, "app-database").allowMainThreadQueries().build();
         for (int i = 0; i < productID.size(); ++i){
             Product product = appDatabase.productDAO().getProductByID(productID.get(i));
-            products.add(product);
+            if (quantities.get(i) != 0){
+                products.add(product);
+            }
         }
         paymentAdapter.setTasks(products);
     }

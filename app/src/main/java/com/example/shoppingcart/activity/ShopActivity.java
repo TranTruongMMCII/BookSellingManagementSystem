@@ -24,7 +24,7 @@ import java.util.List;
 
 public class ShopActivity extends AppCompatActivity implements View.OnClickListener {
     TextView txtSearch;
-    ImageView imgSearch, imgCart, imgHistory;
+    ImageView imgSearch, imgCart, imgHistory, imgClose;
     RecyclerView shopRecyclerView;
     AppDatabase appDatabase;
     ShopAdapter shopAdapter;
@@ -36,6 +36,7 @@ public class ShopActivity extends AppCompatActivity implements View.OnClickListe
         txtSearch = findViewById(R.id.txtSearch);
         imgSearch = findViewById(R.id.imgSearch);
         imgCart = findViewById(R.id.imgCart);
+        imgClose = findViewById(R.id.imgClose);
         imgHistory = findViewById(R.id.imgHistory);
         shopRecyclerView = findViewById(R.id.shopRecyclerView);
         appDatabase = Room.databaseBuilder(ShopActivity.this, AppDatabase.class, "app-database").allowMainThreadQueries().build();
@@ -48,6 +49,7 @@ public class ShopActivity extends AppCompatActivity implements View.OnClickListe
         imgCart.setOnClickListener(this::onClick);
         imgSearch.setOnClickListener(this::onClick);
         imgHistory.setOnClickListener(this::onClick);
+        imgClose.setOnClickListener(this::onClick);
     }
 
     @Override
@@ -76,6 +78,11 @@ public class ShopActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.imgHistory:
                 startActivity(new Intent(ShopActivity.this, ViewHistoryActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                break;
+            case R.id.imgClose:
+                txtSearch.setText("");
+                imgSearch.callOnClick();
+                break;
         }
     }
 

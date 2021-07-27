@@ -57,8 +57,7 @@ public class FragmentProductDetail extends DialogFragment implements View.OnClic
         btnExit.setOnClickListener(view -> dismiss());
 
         btnAddToCart.setOnClickListener(view -> {
-            Constants.productID.add(id);
-            System.out.println(Constants.productID.size());
+            Constants.incrementValue(Constants.ORDER, id);
             Toast.makeText(getActivity(), "Thêm vào giỏ hàng thành công.", Toast.LENGTH_LONG).show();
         });
 
